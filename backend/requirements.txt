@@ -1,0 +1,8 @@
+django
+python-dotenv
+djangorestframework
+drf-spectacular
+pillow
+django-cors-headers
+channels
+uvicorn[standard]

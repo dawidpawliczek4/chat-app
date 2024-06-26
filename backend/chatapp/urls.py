@@ -20,6 +20,12 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from django.conf import settings
 from django.conf.urls.static import static
 from chat.consumers import ChatConsumer
+from chat.views import MessageViewSet
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+from account.views import AccountViewSet
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,6 +33,10 @@ urlpatterns = [
     path('api/schema/ui/',
          SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/server/', include('server.urls')),
+    path('api/messages/', MessageViewSet.as_view({'get': 'list'})),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path("api/account/", AccountViewSet.as_view({'get': 'list'})),
 ]
 
 websocket_urlpatterns = [

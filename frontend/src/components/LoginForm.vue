@@ -2,6 +2,8 @@
 import axios from 'axios';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { getUserDetails, getUserIdFromToken } from '../lib/authServices';
+import { store } from '../store/store';
 
 const router = useRouter();
 
@@ -19,7 +21,16 @@ const handleLogin = async (e: Event) => {
             username: username.value,
             password: password.value
         });
-        console.log(response)
+
+        const { access, refresh } = response.data;
+        localStorage.setItem('access', access);
+        localStorage.setItem('refresh', refresh);
+        localStorage.setItem('userId', getUserIdFromToken(access));
+
+        store.setIsAuthenticated(true);
+
+        getUserDetails()
+
         router.push('/')
     } catch (error) {
         alert('Invalid credentials')
@@ -37,7 +48,3 @@ const handleLogin = async (e: Event) => {
         </form>
     </div>
 </template>
-
-<style lang="">
-
-</style>

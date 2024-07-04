@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.db.models import Count
 
 from rest_framework import viewsets
@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action
 
 from drf_spectacular.utils import extend_schema
 
@@ -14,6 +15,34 @@ from .serializers import ServerSerializer, CategorySerializer
 from .schema import server_list_docs
 
 # Create your views here.
+
+
+class ServerMembershipViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, server_id):
+        server = get_object_or_404(Server, id=server_id)
+        user = request.user
+        if user in server.members.all():
+            return Response({"message": "User is already a member of this server"}, status=400)
+        server.members.add(user)
+        return Response({"message": "User has been added to the server"}, status=200)
+
+    @action(detail=False, methods=['DELETE'])
+    def remove_member(self, request, server_id):
+        server = get_object_or_404(Server, id=server_id)
+        user = request.user
+        if user not in server.members.all():
+            return Response({"message": "User is not a member of this server"}, status=400)
+        server.members.remove(user)
+        return Response({"message": "User has been removed from the server"}, status=200)
+
+    @action(detail=False, methods=['GET'])
+    def is_member(self, request, server_id):
+        server = get_object_or_404(Server, id=server_id)
+        user = request.user
+        is_member = user in server.members.all()
+        return Response({"is_member": is_member})
 
 
 class ServerListViewSet(viewsets.ViewSet):
@@ -73,8 +102,8 @@ class ServerListViewSet(viewsets.ViewSet):
         with_num_members = request.query_params.get(
             'with_num_members') == "true"
 
-        if (by_user or by_serverid) and not request.user.is_authenticated:
-            raise AuthenticationFailed()
+        # if (by_user or by_serverid) and not request.user.is_authenticated:
+        #     raise AuthenticationFailed()
 
         if category:
             self.queryset = self.queryset.filter(

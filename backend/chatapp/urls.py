@@ -25,7 +25,8 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-from account.views import AccountViewSet
+from account.views import AccountViewSet, RegisterViewSet
+from server.views import ServerMembershipViewSet
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -37,6 +38,8 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path("api/account/", AccountViewSet.as_view({'get': 'list'})),
+    path("api/register/", RegisterViewSet.as_view({'post': 'create'})),
+    path(r"api/membership/(?P<server_id>\d+)/membership", ServerMembershipViewSet.as_view({'post': 'create'}))
 ]
 
 websocket_urlpatterns = [

@@ -5,7 +5,6 @@ Chat-App is an advanced real-time messaging application designed to facilitate i
 - Real-time Messaging: Instant communication using WebSockets.
 - User Authentication: Secure user authentication and authorization.
 - Multiple Chat Options: Supports different chat rooms.
-- Responsive Design: User interface built with MUI for a seamless experience across devices.
 - Easy Navigation: Smooth navigation using Vue Router.
 
 # Technologies Used

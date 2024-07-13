@@ -3,6 +3,7 @@ from asgiref.sync import async_to_sync
 
 from .models import Conversation, Message
 from django.contrib.auth import get_user_model
+from server.models import Server
 
 User = get_user_model()
 
@@ -15,33 +16,54 @@ class ChatConsumer(JsonWebsocketConsumer):
         self.user = None
 
     def connect(self):
-        self.user = self.scope['user']        
+        self.user = self.scope['user']                
         self.accept()
+        
         if not self.user.is_authenticated:
+            print("Not authenticated")
             self.close(code=4001)            
+            return 
         
-        self.channel_id = self.scope['url_route']['kwargs']['channelId']
+        self.server_id = self.scope['url_route']['kwargs']['serverId']
+        self.channel_id = self.scope['url_route']['kwargs']['channelId']          
+        print("tutaj")
+        print(self.server_id, self.channel_id)      
 
-        self.user = User.objects.get(id=1)
+        self.user = User.objects.get(id=self.user.id)
+
+        server = Server.objects.get(id=self.server_id)
+        self.is_member = server.members.filter(id=self.user.id).exists()
         
+        if not self.is_member:
+            self.close(code=4002)
+            return
+
+        print("tutaj")
+        print(self.channel_name)
+
         async_to_sync(self.channel_layer.group_add)(
             self.channel_id,
-            self.channel_name
+            self.channel_name,                  
         )
 
     def receive_json(self, content):
-        channel_id = self.channel_id
+        if not self.is_member:
+            print("Not a member")
+            return
+
+        channel_id = self.channel_id        
         sender = self.user
-        message = content['message']
+        message = content['message']        
 
         conversation, created = Conversation.objects.get_or_create(
             channel_id=channel_id)
 
         new_message = Message.objects.create(
             conversation=conversation, sender=sender, content=message)
+                
 
         async_to_sync(self.channel_layer.group_send)(
-            self.channel_id,
+            channel_id,
             {
                 'type': 'chat.message',
                 'new_message': {

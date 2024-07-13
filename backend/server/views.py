@@ -32,8 +32,13 @@ class ServerMembershipViewSet(viewsets.ViewSet):
     def remove_member(self, request, server_id):
         server = get_object_or_404(Server, id=server_id)
         user = request.user
+
         if user not in server.members.all():
             return Response({"message": "User is not a member of this server"}, status=400)
+
+        if server.owner == user:
+            return Response({"message": "Owner cannot remove themselves from the server"}, status=400)
+
         server.members.remove(user)
         return Response({"message": "User has been removed from the server"}, status=200)
 

@@ -1,9 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import axios from 'axios';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { Channel } from '../types/types';
 
-const channels = ref([])
+const channels = ref<Channel[]>([])
 
 const route = useRoute();
 const serverId = computed(() => route.params.serverId)
@@ -13,8 +14,8 @@ watch(serverId, (newServerId) => {
         .then(response => {
             const data = response.data;
             const channel_servers = data[0].channel_server;
-            channels.value = channel_servers;      
-            console.log(channels.value)      
+            channels.value = channel_servers;
+            console.log(channels.value)
         })
         .catch(error => {
             console.log(error);
@@ -28,7 +29,8 @@ watch(serverId, (newServerId) => {
         <div class="flex flex-col border-black border-l-0 border-[1px] p-4 h-screen">
             <h1>Channels</h1>
             <ul>
-                <router-link :to="`/${serverId}/${channel.id}`" v-for="channel in channels" :key="channel.id">{{ channel.name }}</router-link>
+                <router-link :to="`/${serverId}/${channel.id}`" v-for="channel in channels" :key="channel.id">{{
+                    channel.name }}</router-link>
             </ul>
         </div>
         <div class="flex grow p-2">

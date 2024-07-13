@@ -3,3 +3,13 @@ export interface Message {
   content: string;
   timestamp: string;
 }
+
+export type Channel = {
+  id: number;
+  name: string;
+};
+
+export type Server = {
+  id: number;
+  name: string;
+};

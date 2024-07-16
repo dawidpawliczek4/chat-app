@@ -15,9 +15,8 @@ class ServerSerializer(serializers.ModelSerializer):
     category = serializers.StringRelatedField()
 
     class Meta:
-        model = Server
-        # fields = '__all__'
-        exclude = ('members',)
+        model = Server        
+        exclude = ('members','owner')
 
     def get_num_members(self, obj):
         if hasattr(obj, 'num_members'):

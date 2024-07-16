@@ -2,7 +2,6 @@
 import { useWebSocket } from '@vueuse/core'
 import axios from 'axios';
 import { computed, onMounted, ref, watch } from 'vue';
-import { store } from '../store/store';
 import { logout, refreshAccessToken } from '../lib/authServices';
 import { Message } from '../types/types';
 import { useRoute } from 'vue-router';
@@ -112,20 +111,20 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>        
-    <h1>Messages</h1>
+  <div class="flex flex-col pl-6 py-8">
     <div class="flex flex-col h-[360px] overflow-y-auto">
+      <h1>Messages</h1>
       <ul class="grow" ref="messageListRef">
-        <li v-for="message in messages" :key="message.timestamp" class="">
-          <strong>{{ message.sender }}</strong>
-          <p>{{ message.content }}</p>
+        <li v-for="message in messages" :key="message.timestamp" class="flex flex-col rounded-2xl bg-black/10 px-4 py-1 mt-2">
+          <div><strong>{{ message.sender }}</strong></div>
+          <p class="font-light">{{ message.content }}</p>
         </li>
       </ul>
     </div>
-  </div>
-  <div>
-    <input type="text" v-model="messageToSend" @keyup.enter="sendMessage" />
-    <button @click="sendMessage">Send</button>
+    <div class="flex gap-x-2">
+      <input type="text" v-model="messageToSend" @keyup.enter="sendMessage" class="rounded-md bg-secondaryBar border-[1px] focus:outline-1 focus:outline-gray-900  border-white/10 px-3 py-1 text-sm font-light"/>
+      <button @click="sendMessage">Send</button>
+    </div>
   </div>
 
 </template>

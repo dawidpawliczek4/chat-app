@@ -53,9 +53,20 @@ class ServerMembershipViewSet(viewsets.ViewSet):
 class ServerListViewSet(viewsets.ViewSet):
 
     queryset = Server.objects.all()
-    # permission_classes = [IsAuthenticated]
 
-    @server_list_docs
+    def get_permissions(self):
+        if self.action == 'create':
+            return [IsAuthenticated()]
+        return []
+
+    def create(self, request):
+        serializer = ServerSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(owner=request.user, members=[request.user])
+            return Response(serializer.data, status=201)        
+        return Response(serializer.errors, status=400)
+
+    @ server_list_docs
     def list(self, request):
         """
         Retrieves a list of servers based on the provided query parameters.
@@ -136,7 +147,7 @@ class ServerListViewSet(viewsets.ViewSet):
                                       by_serverid} not found")
 
         serializer = ServerSerializer(self.queryset, many=True, context={
-                                      "num_members": with_num_members})
+            "num_members": with_num_members})
         return Response(serializer.data)
 
 
@@ -144,7 +155,7 @@ class CategoryListViewSet(viewsets.ViewSet):
 
     queryset = Server.objects.all()
 
-    @extend_schema(responses=CategorySerializer)
+    @ extend_schema(responses=CategorySerializer)
     def list(self, request):
         serializer = CategorySerializer(self.queryset, many=True)
         return Response(serializer.data)

@@ -18,8 +18,15 @@ const userName = ref('')
 const getUserName = async () => {
     const axiosInstance = useAxiosWithInterceptor();
     const access_token = localStorage.getItem('access');
+    const refresh_token = localStorage.getItem('refresh');
+
+
+    let token = access_token
 
     if (!access_token) {
+        token = refresh_token
+    }
+    if (!token) {
         return 'Anonymous'
     }
 
@@ -33,7 +40,7 @@ const getUserName = async () => {
         return JSON.parse(jsonPayload);
     }
 
-    const user = parseJwt(access_token);
+    const user = parseJwt(token);
 
     try {
         const response = await axiosInstance.get('http://localhost:8000/api/account/?user_id=' + user.user_id)
@@ -54,6 +61,13 @@ axios.get('http://localhost:8000/api/server/select/')
         console.log(error);
     });
 
+const handleLogout = () => {
+    localStorage.removeItem('access')
+    localStorage.removeItem('refresh')
+    localStorage.removeItem('isAuthenticated')
+    isLoggedIn.value = false
+}
+
 onMounted(async () => {
     userName.value = await getUserName()
 })
@@ -62,21 +76,24 @@ onMounted(async () => {
 
 <template>
     <div class="flex flex-row justify-start items-start h-screen">
-        <nav class="h-screen border-black border-[1px] p-4 px-8 flex flex-col">
+        <nav class="h-screen   p-4 px-8 flex flex-col w-44 bg-bar">
             <p>Hello, {{ userName }}</p>
-            <button v-if="isLoggedIn" class="border-[1px] rounded-md">Logout</button>
-            <button v-else class="border-[1px] rounded-md">Login</button>
-            <router-link to="/">Home</router-link>
-            <p>Servers: </p>
+            <button v-if="isLoggedIn" class="border-[1px] rounded-md" @click="handleLogout">Logout</button>
+            <button v-else class="border-[1px] rounded-md"><router-link to="/login">Login</router-link></button>
+
+            <router-link to="/" class="py-2 mb-2 border-b-[1px]">Home</router-link>
+            <p class="text-gray-300 font-light text-xs py-2">Servers</p>            
             <ul>
                 <li v-for="server in servers" :key="server.id">
-                    <router-link :to="'/' + server.id">{{ server.name }}</router-link>
+                    <router-link :to="'/' + server.id" active-class="border-l-[1px] pl-2">{{ server.name }}</router-link>
                 </li>
+                <!-- <router-link to="/add-server" class="mt-2 border-b">Add Server</router-link> -->
+                 
             </ul>
         </nav>
-        <main class="">
+        <main class="w-full h-full">
             <router-view v-if="serverId" />
-            <p v-else>Pick a server from the list.</p>
+            <div v-else class="flex justify-center items-center w-full h-full"><h1 class="">Pick a server from the list.</h1></div>
         </main>
     </div>
 

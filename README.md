@@ -19,3 +19,9 @@ Chat-App is an advanced real-time messaging application designed to facilitate i
 ## Frontend
 - Vue: JavaScript framework for building user interfaces.
 - Vue Router: official client-side routing solution for Vue. 
+
+## Todo
+<!-- 1. Add register form -->
+2. Add server create and channel create form
+3. Add server membership
+4. Add styling

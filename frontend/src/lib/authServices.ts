@@ -66,16 +66,8 @@ export const refreshAccessToken = async () => {
 };
 
 export const register = async (username: string, password: string) => {
-  try {
-    const response = await axios.post("http://localhost:8000/api/register/", {
-      username,
-      password,
-    });
-    
-    const router = useRouter();
-    router.push("/login");
-  } catch (error: any) {
-    alert("Invalid username or password.");
-    console.error(error);
-  }
+  const response = await axios.post("http://localhost:8000/api/register/", {
+    username,
+    password,
+  });
 };

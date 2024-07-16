@@ -8,6 +8,7 @@ const channels = ref<Channel[]>([])
 
 const route = useRoute();
 const serverId = computed(() => route.params.serverId)
+const channelId = computed(() => route.params.channelId)
 
 watch(serverId, (newServerId) => {
     axios.get('http://localhost:8000/api/server/select/?by_serverid=' + newServerId)
@@ -25,16 +26,19 @@ watch(serverId, (newServerId) => {
 </script>
 
 <template>
-    <div class="flex flex-row justify-start items-start">
-        <div class="flex flex-col border-black border-l-0 border-[1px] p-4 h-screen">
-            <h1>Channels</h1>
+    <div class="flex flex-row justify-start items-start ">
+        <div class="flex flex-col  p-4 h-screen bg-secondaryBar w-44">
+            <p class="font-light text-xs text-gray-300 pb-2">Channels</p>
             <ul>
-                <router-link :to="`/${serverId}/${channel.id}`" v-for="channel in channels" :key="channel.id">{{
-                    channel.name }}</router-link>
+                <router-link :to="`/${serverId}/${channel.id}`" v-for="channel in channels"
+                    class="px-2 py-1 rounded-full" :key="channel.id" active-class="bg-black/20"><span
+                        class="font-light text-xs text-gray-300">#</span> {{
+                            channel.name }}</router-link>
             </ul>
         </div>
-        <div class="flex grow p-2">
-            <router-view />
+        <div class="flex grow p-2 w-full h-screen">
+            <router-view v-if="channelId" />
+            <div v-else class="flex items-center justify-center w-full h-full"><p>Pick a channel from the list.</p></div>
         </div>
     </div>
 </template>

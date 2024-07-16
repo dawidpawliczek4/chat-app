@@ -46,5 +46,6 @@ const handleLogin = async (e: Event) => {
             <input type="password" placeholder="Password" v-model="password" />
             <button type="submit">Login</button>
         </form>
+        <p>Or <router-link to="/register">Register</router-link></p>
     </div>
 </template>

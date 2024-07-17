@@ -11,7 +11,7 @@ from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema
 
 from .models import Server
-from .serializers import ServerSerializer, CategorySerializer
+from .serializers import ServerSerializer, CategorySerializer, ServerAddSerializer
 from .schema import server_list_docs
 
 # Create your views here.
@@ -50,24 +50,16 @@ class ServerMembershipViewSet(viewsets.ViewSet):
         return Response({"is_member": is_member})
 
 
-class ServerListViewSet(viewsets.ViewSet):
-
-    queryset = Server.objects.all()
+class ServerListViewSet(viewsets.ViewSet):    
 
     def get_permissions(self):
         if self.action == 'create':
             return [IsAuthenticated()]
         return []
 
-    def create(self, request):
-        serializer = ServerSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(owner=request.user, members=[request.user])
-            return Response(serializer.data, status=201)        
-        return Response(serializer.errors, status=400)
-
     @ server_list_docs
     def list(self, request):
+        self.queryset = Server.objects.all()
         """
         Retrieves a list of servers based on the provided query parameters.
 
@@ -159,3 +151,29 @@ class CategoryListViewSet(viewsets.ViewSet):
     def list(self, request):
         serializer = CategorySerializer(self.queryset, many=True)
         return Response(serializer.data)
+
+
+class ServerViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request):
+        serializer = ServerAddSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(owner=request.user)
+        return Response(serializer.data)
+
+    # def update(self, request, pk=None):
+    #     server = get_object_or_404(Server, id=pk)
+    #     if request.user != server.owner:
+    #         return Response({"message": "You are not the owner of this server"}, status=400)
+    #     serializer = ServerSerializer(server, data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save()
+    #     return Response(serializer.data)
+
+    # def destroy(self, request, pk=None):
+    #     server = get_object_or_404(Server, id=pk)
+    #     if request.user != server.owner:
+    #         return Response({"message": "You are not the owner of this server"}, status=400)
+    #     server.delete()
+    #     return Response({"message": "Server has been deleted"}, status=200)

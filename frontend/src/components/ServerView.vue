@@ -36,7 +36,7 @@ watch(serverId, (newServerId) => {
                             channel.name }}</router-link>
             </ul>
         </div>
-        <div class="flex grow p-2 w-full h-screen">
+        <div class="flex grow p-2 h-screen">
             <router-view v-if="channelId" />
             <div v-else class="flex items-center justify-center w-full h-full"><p>Pick a channel from the list.</p></div>
         </div>

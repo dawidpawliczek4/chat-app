@@ -4,6 +4,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { getUserDetails, getUserIdFromToken } from '../lib/authServices';
 import { store } from '../store/store';
+import { FwbInput } from 'flowbite-vue';
 
 const router = useRouter();
 
@@ -40,12 +41,13 @@ const handleLogin = async (e: Event) => {
 </script>
 
 <template>
-    <div>
-        <form @submit="handleLogin">
-            <input type="text" placeholder="Username" v-model="username" />
-            <input type="password" placeholder="Password" v-model="password" />
-            <button type="submit">Login</button>
+    <div class="flex flex-col w-full justify-center items-center h-screen gap-y-4 dark">
+        <form @submit="handleLogin" class="flex flex-col gap-y-2">
+            <fwb-input type="text" placeholder="Username" v-model="username" />
+            <fwb-input type="password" placeholder="Password" v-model="password" />
+            <button type="submit" class=" font-semibold hover:text-gray-300">Login</button>
         </form>
-        <p>Or <router-link to="/register">Register</router-link></p>
+        <p class="font-light text-gray-300 tracking-wide"><span class="text-sm">Or</span> <router-link to="/register"
+                class="hover:text-white ">Register</router-link></p>
     </div>
 </template>

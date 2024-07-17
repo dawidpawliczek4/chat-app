@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router';
 import { computed } from 'vue';
 import { Server } from '../types/types';
 import { useAxiosWithInterceptor } from '../lib/jwtInterceptor';
+import Modal from './Modal.vue';
 
 const servers = ref<Server[]>([])
 
@@ -76,24 +77,29 @@ onMounted(async () => {
 
 <template>
     <div class="flex flex-row justify-start items-start h-screen">
-        <nav class="h-screen   p-4 px-8 flex flex-col w-44 bg-bar">
-            <p>Hello, {{ userName }}</p>
-            <button v-if="isLoggedIn" class="border-[1px] rounded-md" @click="handleLogout">Logout</button>
-            <button v-else class="border-[1px] rounded-md"><router-link to="/login">Login</router-link></button>
+        <nav class="h-screen p-4 px-8 flex flex-col bg-bar">
+            
+                <p>Hello, {{ userName }}</p>
+                <button v-if="isLoggedIn" class="border-[1px] rounded-md" @click="handleLogout">Logout</button>
+                <button v-else class="border-[1px] rounded-md"><router-link to="/login">Login</router-link></button>
 
-            <router-link to="/" class="py-2 mb-2 border-b-[1px]">Home</router-link>
-            <p class="text-gray-300 font-light text-xs py-2">Servers</p>            
-            <ul>
-                <li v-for="server in servers" :key="server.id">
-                    <router-link :to="'/' + server.id" active-class="border-l-[1px] pl-2">{{ server.name }}</router-link>
-                </li>
-                <!-- <router-link to="/add-server" class="mt-2 border-b">Add Server</router-link> -->
-                 
-            </ul>
+                <router-link to="/" class="py-2 mb-2 border-b-[1px]">Home</router-link>
+                <p class="text-gray-300 font-light text-xs py-2">Servers</p>
+                <ul class="pb-6">
+                    <li v-for="server in servers" :key="server.id">
+                        <router-link :to="'/' + server.id" active-class="border-l-[1px] pl-2">{{ server.name
+                            }}</router-link>
+                    </li>
+                </ul>
+                        
+            <Modal />
+
         </nav>
-        <main class="w-full h-full">
+        <main class="h-full">
             <router-view v-if="serverId" />
-            <div v-else class="flex justify-center items-center w-full h-full"><h1 class="">Pick a server from the list.</h1></div>
+            <div v-else class="flex justify-center items-center w-full h-full">
+                <h1 class="">Pick a server from the list.</h1>
+            </div>
         </main>
     </div>
 

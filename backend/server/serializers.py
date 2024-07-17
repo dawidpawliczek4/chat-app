@@ -10,13 +10,13 @@ class ChannelSerializer(serializers.ModelSerializer):
 
 
 class ServerSerializer(serializers.ModelSerializer):
-    channel_server = ChannelSerializer(many=True)
+    channel_server = ChannelSerializer(many=True, read_only=True)
     num_members = serializers.SerializerMethodField()
     category = serializers.StringRelatedField()
 
     class Meta:
-        model = Server        
-        exclude = ('members','owner')
+        model = Server
+        exclude = ('members', "owner",)            
 
     def get_num_members(self, obj):
         if hasattr(obj, 'num_members'):
@@ -30,6 +30,11 @@ class ServerSerializer(serializers.ModelSerializer):
             data.pop('num_members')
         return data
 
+
+class ServerAddSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Server
+        exclude = ('members', 'owner',)
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:

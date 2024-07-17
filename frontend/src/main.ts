@@ -7,7 +7,6 @@ import App from "./App.vue";
 import RegisterForm from "./components/RegisterForm.vue";
 import Layout from "./components/Layout.vue";
 import ServerView from "./components/ServerView.vue";
-import CreateServerView from "./components/CreateServerView.vue";
 
 const routes = [
   {
@@ -35,7 +34,6 @@ const routes = [
   },
   { path: "/login", component: LoginForm },
   { path: "/register", component: RegisterForm },
-  { path: "/create-server", component: CreateServerView },
 ];
 
 const router = createRouter({

@@ -2,7 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+@import '/node_modules/flowbite-vue/dist/index.css';
+
 body, html, #root {
   @apply text-white;
-  @apply bg-background;
+  @apply bg-background;  
 }

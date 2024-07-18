@@ -4,6 +4,9 @@ import { FwbButton, FwbModal, FwbInput, FwbSelect } from 'flowbite-vue'
 import { useAxiosWithInterceptor } from '../lib/jwtInterceptor';
 import { useRouter } from 'vue-router';
 
+const props = defineProps<{
+    serverId: string
+}>()
 
 const router = useRouter()
 
@@ -17,12 +20,11 @@ function showModal() {
 }
 
 const name = ref('')
-const description = ref('')
-const category = ref('')
+const topic = ref('')
 
-async function createServer() {
+async function createChannel() {
 
-    if (!name.value || !description.value || !category.value) {
+    if (!name.value || !topic.value) {
         alert('Please fill all fields');
         return;
     }
@@ -31,16 +33,16 @@ async function createServer() {
 
     try {
         const axiosInstance = useAxiosWithInterceptor();
-        await axiosInstance.post('http://localhost:8000/api/server/add/', {
+        await axiosInstance.post('http://localhost:8000/api/server/channel/', {
             name: name.value,
-            description: description.value,
-            category: category.value,
-            channel_server: []
+            description: topic.value,
+            server: props.serverId
         });
 
-
+        router.go(0);
+        
     } catch (error) {
-        alert('Error creating server: ' + error);
+        alert('Error creating channel: ' + error);
         console.error(error);
     }
 }
@@ -48,22 +50,20 @@ async function createServer() {
 </script>
 
 <template>
-    <fwb-button @click="showModal">
-        Add server
+    <fwb-button @click="showModal" class="mt-4">
+        Add channel
     </fwb-button>
 
     <fwb-modal v-if="isShowModal" @close="closeModal" class="dark">
         <template #header>
             <div class="flex items-center text-lg">
-                Create a new server
+                Create a new channel
             </div>
         </template>
         <template #body>
             <div class="flex flex-col gap-y-4">
-                <fwb-input v-model="name" label="Server name" placeholder="Enter server name" />
-                <fwb-input v-model="description" label="Server description" placeholder="Enter server description" />
-                <fwb-select v-model="category" label="Category"
-                    :options="[{ name: 'Category 1', value: '1' }, { name: 'Category 2', value: '2' }]" />
+                <fwb-input v-model="name" label="Channel name" placeholder="Enter channel name" />
+                <fwb-input v-model="topic" label="Channel topic" placeholder="Enter channel topic" />
             </div>
         </template>
         <template #footer>
@@ -71,7 +71,7 @@ async function createServer() {
                 <fwb-button @click="closeModal" color="alternative">
                     Cancel
                 </fwb-button>
-                <fwb-button @click="createServer" color="green">
+                <fwb-button @click="createChannel" color="green">
                     Create
                 </fwb-button>
             </div>

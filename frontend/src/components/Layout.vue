@@ -5,7 +5,7 @@ import { useRoute } from 'vue-router';
 import { computed } from 'vue';
 import { Server } from '../types/types';
 import { useAxiosWithInterceptor } from '../lib/jwtInterceptor';
-import Modal from './Modal.vue';
+import AddServerModal from './AddServerModal.vue';
 
 const servers = ref<Server[]>([])
 
@@ -92,10 +92,10 @@ onMounted(async () => {
                     </li>
                 </ul>
                         
-            <Modal />
+            <AddServerModal />
 
         </nav>
-        <main class="h-full">
+        <main class="h-full grow">
             <router-view v-if="serverId" />
             <div v-else class="flex justify-center items-center w-full h-full">
                 <h1 class="">Pick a server from the list.</h1>

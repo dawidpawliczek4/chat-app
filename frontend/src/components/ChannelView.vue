@@ -20,29 +20,9 @@ const refresh_token = ref(localStorage.getItem('refresh'))
 const socketUrl = computed(() => `ws://localhost:8000/${serverId.value}/${channelId.value}`)
 const messagesUrl = computed(() => `http://localhost:8000/api/messages/?channel_id=${channelId.value}&server_id=${serverId.value}`)
 
-const downloadMessageHistory = async () => {
-  const response = await axios.get(messagesUrl.value)
-  const data = await response.data
-  messages.value = data
-}
-
-const updateCookies = () => {
-  document.cookie = `access_token = ${access_token.value}; path=/`
-  document.cookie = `refresh_token = ${refresh_token.value}; path=/`
-}
-
-watch(access_token, updateCookies, { immediate: true })
-watch(refresh_token, updateCookies, { immediate: true })
-
-
-watch(route.params, async (newParams) => {
-  serverId.value = newParams.serverId
-  channelId.value = newParams.channelId
-  downloadMessageHistory()
-})
-
-
-const { send } = useWebSocket(socketUrl.value, {
+const { send, open, close } = useWebSocket(socketUrl.value, {
+  immediate: false,
+  autoClose: true,
   autoReconnect: {
     retries: 3,
     delay: 1000,
@@ -75,6 +55,43 @@ const { send } = useWebSocket(socketUrl.value, {
       }
     }
   },
+})
+
+
+const downloadMessageHistory = async () => {
+  const response = await axios.get(messagesUrl.value)
+  const data = await response.data
+  messages.value = data
+}
+
+const updateCookies = () => {
+  document.cookie = `access_token = ${access_token.value}; path=/`
+  document.cookie = `refresh_token = ${refresh_token.value}; path=/`
+}
+
+watch(access_token, updateCookies, { immediate: true })
+watch(refresh_token, updateCookies, { immediate: true })
+
+
+// watch(route.params, async (newParams) => {
+//   console.log(newParams)
+//   serverId.value = newParams.serverId
+//   channelId.value = newParams.channelId
+//   downloadMessageHistory()
+// })
+
+watch(() => route.params.serverId, async (newServerId) => {
+  serverId.value = newServerId
+  close()
+  open()
+  downloadMessageHistory()
+})
+
+watch(() => route.params.channelId, async (newChannelId) => {
+  channelId.value = newChannelId
+  close()
+  open()
+  downloadMessageHistory()
 })
 
 const sendMessage = () => {
@@ -115,14 +132,16 @@ onMounted(() => {
     <div class="flex flex-col h-[360px] overflow-y-auto">
       <h1>Messages</h1>
       <ul class="grow" ref="messageListRef">
-        <li v-for="message in messages" :key="message.timestamp" class="flex flex-col rounded-2xl bg-black/10 px-4 py-1 mt-2">
+        <li v-for="message in messages" :key="message.timestamp"
+          class="flex flex-col rounded-2xl bg-black/10 px-4 py-1 mt-2">
           <div><strong>{{ message.sender }}</strong></div>
           <p class="font-light">{{ message.content }}</p>
         </li>
       </ul>
     </div>
     <div class="flex gap-x-2">
-      <input type="text" v-model="messageToSend" @keyup.enter="sendMessage" class="rounded-md bg-secondaryBar border-[1px] focus:outline-1 focus:outline-gray-900  border-white/10 px-3 py-1 text-sm font-light"/>
+      <input type="text" v-model="messageToSend" @keyup.enter="sendMessage"
+        class="rounded-md bg-secondaryBar border-[1px] focus:outline-1 focus:outline-gray-900  border-white/10 px-3 py-1 text-sm font-light" />
       <button @click="sendMessage">Send</button>
     </div>
   </div>

@@ -11,7 +11,7 @@ from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema
 
 from .models import Server
-from .serializers import ServerSerializer, CategorySerializer, ServerAddSerializer
+from .serializers import ServerSerializer, CategorySerializer, ServerAddSerializer, ChannelSerializer
 from .schema import server_list_docs
 
 # Create your views here.
@@ -146,8 +146,7 @@ class ServerListViewSet(viewsets.ViewSet):
 class CategoryListViewSet(viewsets.ViewSet):
 
     queryset = Server.objects.all()
-
-    @ extend_schema(responses=CategorySerializer)
+    
     def list(self, request):
         serializer = CategorySerializer(self.queryset, many=True)
         return Response(serializer.data)
@@ -161,19 +160,13 @@ class ServerViewSet(viewsets.ViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save(owner=request.user)
         return Response(serializer.data)
+    
+class ChannelViewSet(viewsets.ViewSet):
+    
+    permission_classes = [IsAuthenticated]
 
-    # def update(self, request, pk=None):
-    #     server = get_object_or_404(Server, id=pk)
-    #     if request.user != server.owner:
-    #         return Response({"message": "You are not the owner of this server"}, status=400)
-    #     serializer = ServerSerializer(server, data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     serializer.save()
-    #     return Response(serializer.data)
-
-    # def destroy(self, request, pk=None):
-    #     server = get_object_or_404(Server, id=pk)
-    #     if request.user != server.owner:
-    #         return Response({"message": "You are not the owner of this server"}, status=400)
-    #     server.delete()
-    #     return Response({"message": "Server has been deleted"}, status=200)
+    def create(self, request):        
+        serializer = ChannelSerializer(data=request.data)        
+        serializer.is_valid(raise_exception=True)
+        serializer.save(owner=request.user)
+        return Response(serializer.data)

@@ -6,7 +6,7 @@ from rest_framework import serializers
 class ChannelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Channel
-        fields = '__all__'
+        exclude = ('owner',)
 
 
 class ServerSerializer(serializers.ModelSerializer):
@@ -16,7 +16,7 @@ class ServerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Server
-        exclude = ('members', "owner",)            
+        exclude = ('members', "owner",)
 
     def get_num_members(self, obj):
         if hasattr(obj, 'num_members'):
@@ -35,6 +35,7 @@ class ServerAddSerializer(serializers.ModelSerializer):
     class Meta:
         model = Server
         exclude = ('members', 'owner',)
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:

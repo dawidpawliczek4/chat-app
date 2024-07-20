@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { FwbButton, FwbModal, FwbInput, FwbSelect } from 'flowbite-vue'
 import { useAxiosWithInterceptor } from '../lib/jwtInterceptor';
 import { useRouter } from 'vue-router';
-
+import { FwbFileInput } from 'flowbite-vue'
 
 const router = useRouter()
 
@@ -19,6 +19,7 @@ function showModal() {
 const name = ref('')
 const description = ref('')
 const category = ref('')
+const image = ref<File | null>(null)
 
 async function createServer() {
 
@@ -27,15 +28,36 @@ async function createServer() {
         return;
     }
 
-    isShowModal.value = false
+    if (image.value && !['image/jpeg', 'image/png', 'image/gif'].includes(image.value.type)) {
+        alert('Invalid image type');
+        return;
+    }
+
+    // check if image is under 100x100px
+    if (image.value) {
+        const img = new Image();
+        img.src = URL.createObjectURL(image.value);
+        await new Promise(resolve => img.onload = resolve);
+        if (img.width > 100 || img.height > 100) {
+            alert('Image must be max 100x100px');
+            return;
+        }
+    }
+
+    const formData = new FormData();
+    formData.append('name', name.value);
+    formData.append('description', description.value);
+    formData.append('category', category.value);
+    if (image.value) {
+        formData.append('icon', image.value);
+    }
 
     try {
         const axiosInstance = useAxiosWithInterceptor();
-        await axiosInstance.post('http://localhost:8000/api/server/add/', {
-            name: name.value,
-            description: description.value,
-            category: category.value,
-            channel_server: []
+        await axiosInstance.post('http://localhost:8000/api/server/add/', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
         });
 
         router.go(0);
@@ -43,6 +65,8 @@ async function createServer() {
     } catch (error) {
         alert('Error creating server: ' + error);
         console.error(error);
+    } finally {
+        isShowModal.value = false;
     }
 }
 
@@ -65,6 +89,9 @@ async function createServer() {
                 <fwb-input v-model="description" label="Server description" placeholder="Enter server description" />
                 <fwb-select v-model="category" label="Category"
                     :options="[{ name: 'Category 1', value: '1' }, { name: 'Category 2', value: '2' }]" />
+                <fwb-file-input v-model="image" label="Server image">
+                    <p class="text-sm text-gray-300 mt-1">JPG, JPEG, PNG or GIF (MAX. 100x100px)</p>
+                </fwb-file-input>
             </div>
         </template>
         <template #footer>

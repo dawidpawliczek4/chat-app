@@ -6,7 +6,7 @@ import { computed } from 'vue';
 import { Server } from '../types/types';
 import { useAxiosWithInterceptor } from '../lib/jwtInterceptor';
 import AddServerModal from './AddServerModal.vue';
-
+import { MEDIA_URL } from '../lib/urls';
 const servers = ref<Server[]>([])
 
 const route = useRoute();
@@ -78,20 +78,22 @@ onMounted(async () => {
 <template>
     <div class="flex flex-row justify-start items-start h-screen">
         <nav class="h-screen p-4 px-8 flex flex-col bg-bar">
-            
-                <p>Hello, {{ userName }}</p>
-                <button v-if="isLoggedIn" class="border-[1px] rounded-md" @click="handleLogout">Logout</button>
-                <button v-else class="border-[1px] rounded-md"><router-link to="/login">Login</router-link></button>
 
-                <router-link to="/" class="py-2 mb-2 border-b-[1px]">Home</router-link>
-                <p class="text-gray-300 font-light text-xs py-2">Servers</p>
-                <ul class="pb-6">
-                    <li v-for="server in servers" :key="server.id">
-                        <router-link :to="'/' + server.id" active-class="border-l-[1px] pl-2">{{ server.name
-                            }}</router-link>
-                    </li>
-                </ul>
-                        
+            <p>Hello, {{ userName }}</p>
+            <button v-if="isLoggedIn" class="border-[1px] rounded-md" @click="handleLogout">Logout</button>
+            <button v-else class="border-[1px] rounded-md"><router-link to="/login">Login</router-link></button>
+
+            <router-link to="/" class="py-2 mb-2 border-b-[1px]">Home</router-link>
+            <p class="text-gray-300 font-light text-xs py-2">Servers</p>
+            <ul class="pb-6">
+                <li v-for="server in servers" :key="server.id">
+                    <router-link :to="'/' + server.id" active-class="border-l-[1px] pl-2">{{ server.name
+                        }}</router-link>
+                    <img v-if="server.icon" v-bind:src="MEDIA_URL + server.icon"
+                        v-bind:alt="server.name + ' - server icon'" class="w-10 h-10">
+                </li>
+            </ul>
+
             <AddServerModal />
 
         </nav>

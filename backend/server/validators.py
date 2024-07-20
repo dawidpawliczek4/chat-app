@@ -7,7 +7,7 @@ def validate_icon_image_size(image):
     if image:
         with Image.open(image) as img:
             if img.width > 100 or img.height > 100:
-                raise ValidationError("Image size must be maxx 100x100 pixels")
+                raise ValidationError("Image size must be max 100x100 pixels")
 
 
 def validate_image_file_extension(image):

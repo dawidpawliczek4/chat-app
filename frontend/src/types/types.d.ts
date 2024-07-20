@@ -12,4 +12,5 @@ export type Channel = {
 export type Server = {
   id: number;
   name: string;
+  icon?: string;
 };
